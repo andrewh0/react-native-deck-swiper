@@ -503,24 +503,27 @@ class Swiper extends Component {
     let swipedAllCards = false
 
     this.onSwipedCallbacks(onSwiped)
-
-    const allSwipedCheck = () => {
-      return newCardIndex === this.props.cards.length
-    }
-
-    if (allSwipedCheck()) {
-      if (!infinite) {
-        this.props.onSwipedAll()
-        // onSwipeAll may have added cards
-        if (allSwipedCheck()) {
-          swipedAllCards = true
-        }
-      } else {
-        newCardIndex = 0;
+    this.forceUpdate(() => {
+      const allSwipedCheck = () => {
+        return newCardIndex === this.props.cards.length
       }
-    }
 
-    this.setCardIndex(newCardIndex, swipedAllCards)
+      if (allSwipedCheck()) {
+        if (!infinite) {
+          this.props.onSwipedAll()
+          // onSwipeAll may have added cards
+          if (allSwipedCheck()) {
+            swipedAllCards = true
+          }
+        } else {
+          newCardIndex = 0;
+        }
+      }
+
+      this.setCardIndex(newCardIndex, swipedAllCards)
+
+    })
+
   }
 
   decrementCardIndex = cb => {
