@@ -16,11 +16,11 @@ const LABEL_TYPES = {
 }
 const SWIPE_MULTIPLY_FACTOR = 4.5
 
-const calculateCardIndexes = (firstCardIndex, cards) => {
-  firstCardIndex = firstCardIndex || 0
-  const previousCardIndex = firstCardIndex === 0 ? cards.length - 1 : firstCardIndex - 1
-  const secondCardIndex = firstCardIndex === cards.length - 1 ? 0 : firstCardIndex + 1
-  return { firstCardIndex, secondCardIndex, previousCardIndex }
+const calculateCardIndexes = (currentCardIndex, cards) => {
+  let currentOrZeroIndex = currentCardIndex || 0
+  const previousCardIndex = currentOrZeroIndex === 0 ? cards.length - 1 : currentOrZeroIndex - 1
+  const secondCardIndex = currentOrZeroIndex === cards.length - 1 ? 0 : currentOrZeroIndex + 1
+  return { firstCardIndex: currentOrZeroIndex, secondCardIndex, previousCardIndex }
 }
 
 const rebuildStackAnimatedValues = (props) => {
@@ -70,6 +70,7 @@ class Swiper extends Component {
       !isEqual(props.cards, nextProps.cards) ||
       props.cardIndex !== nextProps.cardIndex
     )
+
     const stateChanged = (
       nextState.firstCardIndex !== state.firstCardIndex ||
       nextState.secondCardIndex !== state.secondCardIndex ||
@@ -503,7 +504,9 @@ class Swiper extends Component {
 
     this.onSwipedCallbacks(onSwiped)
 
-    allSwipedCheck = () => newCardIndex === this.props.cards.length
+    const allSwipedCheck = () => {
+      return newCardIndex === this.props.cards.length
+    }
 
     if (allSwipedCheck()) {
       if (!infinite) {
@@ -760,14 +763,14 @@ class Swiper extends Component {
   }
 
   renderStack = () => {
-    const { firstCardIndex, swipedAllCards } = this.state
+    const { firstCardIndex } = this.state
     const renderedCards = []
     let { stackSize, infinite, showSecondCard, cards } = this.props
     let index = firstCardIndex
     let firstCard = true
     let cardPosition = 0
 
-    while (stackSize-- > 0 && (firstCard || showSecondCard) && !swipedAllCards) {
+    while (stackSize-- > 0 && (firstCard || showSecondCard) && index !== cards.length) {
       const key = this.getCardKey(cards[index], index)
       this.pushCardToStack(renderedCards, index, cardPosition, key, firstCard)
 
